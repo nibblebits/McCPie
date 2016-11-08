@@ -53,6 +53,10 @@ public class McCPie extends JComponent {
         this.available_colours.add(Color.MAGENTA);
     }
 
+    public String getVersion() {
+        return Config.version_name;
+    }
+    
     public void setPercentageFormat(String percentage_format)
     {
         this.df = new DecimalFormat(percentage_format);
