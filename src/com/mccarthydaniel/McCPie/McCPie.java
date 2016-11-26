@@ -15,17 +15,18 @@ import javax.swing.JComponent;
  *
  * @author Daniel McCarthy
  */
-public class McCPie extends JComponent{
+public class McCPie extends JComponent {
 
-    private static final int TEXT_BORDER_X = 420;
-    private static final int TEXT_BORDER_Y = 100;
-    private static final int TEXT_BORDER_WIDTH = 180;
+    private static final int TEXT_BORDER_X_PERCENTAGE = 60;
+    private static final int TEXT_BORDER_Y_PERCENTAGE = 10;
+    private static final int TEXT_BORDER_WIDTH_PERCENTAGE = 30;
+    private static final int TEXT_BORDER_HEIGHT_PERCENTAGE = 20;
     private static final int TEXT_START_X = 20;
     private static final int TEXT_START_Y = 20;
     private static final int TEXT_PADDING = 20;
     private final ArrayList<Slice> slices;
-    private final Font title_font = new Font("Serif", Font.BOLD, 24);
-    private final Font slice_name_font = new Font("Serif", Font.BOLD, 12);
+    private Font title_font = new Font("Serif", Font.BOLD, 1);
+    private Font slice_name_font = new Font("Serif", Font.BOLD, 1);
     private ArrayList<Color> available_colours;
     private DecimalFormat df = new DecimalFormat("#.##");
     private double value_sum;
@@ -58,12 +59,11 @@ public class McCPie extends JComponent{
     public String getVersion() {
         return Config.version_name;
     }
-    
-    public void setPercentageFormat(String percentage_format)
-    {
+
+    public void setPercentageFormat(String percentage_format) {
         this.df = new DecimalFormat(percentage_format);
     }
-    
+
     public Color getRandomRGBColour() {
         Random random = new Random();
         int R = random.nextInt(255);
@@ -75,7 +75,7 @@ public class McCPie extends JComponent{
     public void showPercentages(boolean show_percentages) {
         this.show_percentages = show_percentages;
     }
-    
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -122,18 +122,38 @@ public class McCPie extends JComponent{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        int c_width = this.getWidth();
+        int c_height = this.getHeight();
+
+        int arc_size_w = c_width / 2;
+        int arc_size_h = c_height / 2;
+
+        float title_font_size = 10 * arc_size_w / 100;
+        int title_pos_x = arc_size_w / 2 / 2;
+        int title_pos_y = (int) (arc_size_h + title_font_size);
+        this.title_font = this.title_font.deriveFont(title_font_size);
+
+        float slice_name_font_size = 5 * arc_size_w / 100;
+        this.slice_name_font = this.slice_name_font.deriveFont(slice_name_font_size);
+
+        int text_border_x = McCPie.TEXT_BORDER_X_PERCENTAGE * c_width / 100;
+        int text_border_y = McCPie.TEXT_BORDER_Y_PERCENTAGE * c_height / 100;
+        int text_border_width = McCPie.TEXT_BORDER_WIDTH_PERCENTAGE * c_width / 100;
+        int text_border_height = (int) ((McCPie.TEXT_BORDER_HEIGHT_PERCENTAGE * c_height / 100) + (this.slices.size() * slice_name_font_size));
+
         int last_angle = 0;
         int current_text_y = 0;
-        int i = 0;
+
+        g.setColor(this.border_colour);
+        g.fillRect(text_border_x, text_border_y, text_border_width, text_border_height);
+
         for (Slice slice : this.slices) {
             int angle = (int) Math.round((slice.getValue() / this.value_sum) * 360);
-            int s_x = McCPie.TEXT_BORDER_X + McCPie.TEXT_START_X;
-            int s_y = McCPie.TEXT_BORDER_Y + McCPie.TEXT_START_Y + current_text_y;
-            g.setColor(this.border_colour);
-            g.fillRect(McCPie.TEXT_BORDER_X, McCPie.TEXT_BORDER_Y + (i * McCPie.TEXT_PADDING), McCPie.TEXT_BORDER_WIDTH, McCPie.TEXT_PADDING + 5);
+            int s_x = (int) (text_border_x);
+            int s_y = (int) (text_border_y + current_text_y + slice_name_font_size);
             Color slice_colour = slice.getColour();
             g.setColor(slice_colour);
-            g.fillArc(0, 0, 300, 300, last_angle, angle);
+            g.fillArc(0, 0, arc_size_w, arc_size_h, last_angle, angle);
             g.setFont(this.slice_name_font);
 
             String slice_str = slice.getName();
@@ -143,13 +163,12 @@ public class McCPie extends JComponent{
             }
             g.drawString(slice_str, s_x, s_y);
             last_angle += angle;
-            current_text_y += McCPie.TEXT_PADDING;
-            i++;
+            current_text_y += (slice_name_font_size);
         }
 
         g.setFont(this.title_font);
         g.setColor(Color.BLACK);
-        g.drawString(this.title, 118, 350);
+        g.drawString(this.title, title_pos_x, title_pos_y);
 
     }
 }
