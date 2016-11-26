@@ -24,13 +24,10 @@ public class McCPie extends JComponent {
     private static final int TEXT_BORDER_Y_PERCENTAGE = 10;
     private static final int TEXT_BORDER_WIDTH_PERCENTAGE = 30;
     private static final int TEXT_BORDER_HEIGHT_PERCENTAGE = 20;
-    private static final int TEXT_START_X = 20;
-    private static final int TEXT_START_Y = 20;
-    private static final int TEXT_PADDING = 20;
     private final ArrayList<Slice> slices;
     private Font title_font = new Font("Serif", Font.BOLD, 1);
     private Font slice_name_font = new Font("Serif", Font.BOLD, 1);
-    private ArrayList<Color> available_colours;
+    private final ArrayList<Color> available_colours;
     private DecimalFormat df = new DecimalFormat("#.##");
     private double value_sum;
     private Color border_colour;
