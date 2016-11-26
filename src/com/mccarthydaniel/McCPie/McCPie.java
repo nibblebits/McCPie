@@ -162,15 +162,15 @@ public class McCPie extends JComponent {
         int c_width = this.getWidth();
         int c_height = this.getHeight();
 
-        int arc_size_w = c_width / 2;
-        int arc_size_h = c_height / 2;
+        int arc_size_w = (int) (c_width / 2);
+        int arc_size_h = (int) (c_height / 1.3);
 
         float title_font_size = 10 * arc_size_w / 100;
         int title_pos_x = arc_size_w / 2 / 2;
         int title_pos_y = (int) (arc_size_h + title_font_size);
         this.title_font = this.title_font.deriveFont(title_font_size);
 
-        float slice_name_font_size = 5 * arc_size_w / 100;
+        float slice_name_font_size = 7 * arc_size_w / 100;
         this.slice_name_font = this.slice_name_font.deriveFont(slice_name_font_size);
 
         int text_border_x = McCPie.TEXT_BORDER_X_PERCENTAGE * c_width / 100;
