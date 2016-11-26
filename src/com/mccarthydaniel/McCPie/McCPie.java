@@ -1,5 +1,6 @@
 package com.mccarthydaniel.McCPie;
 
+import com.mccarthydaniel.McCPie.exceptions.InvalidRangeException;
 import com.mccarthydaniel.McCPie.exceptions.NoColoursAvailableException;
 import java.awt.Color;
 import java.awt.Font;
@@ -9,6 +10,8 @@ import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 
 /**
@@ -64,12 +67,38 @@ public class McCPie extends JComponent {
         this.df = new DecimalFormat(percentage_format);
     }
 
+    public Color getRandomColour() {
+        if (this.available_colours.isEmpty())
+        {
+            return getRandomRGBColour();
+        }
+        
+        try {
+            return getRandomAvailableSolidColour();
+        } catch (NoColoursAvailableException ex) {
+            // Do not need to do anything as this will never throw.
+        }
+        
+        return null;
+    }
+    
     public Color getRandomRGBColour() {
         Random random = new Random();
         int R = random.nextInt(255);
         int G = random.nextInt(255);
         int B = random.nextInt(255);
         return new Color(R, G, B);
+    }
+
+    public Color getRandomAvailableSolidColour() throws NoColoursAvailableException {
+        if (this.available_colours.isEmpty()) {
+            throw new NoColoursAvailableException("No more random colours are available, please select manually.");
+        }
+        Random rand = new Random();
+        int index = rand.nextInt(this.available_colours.size());
+        Color selected_colour = this.available_colours.get(index);
+        this.available_colours.remove(index);
+        return selected_colour;
     }
 
     public void showPercentages(boolean show_percentages) {
@@ -92,17 +121,6 @@ public class McCPie extends JComponent {
         return this.border_colour;
     }
 
-    public Color getRandomAvailableSolidColour() throws NoColoursAvailableException {
-        if (this.available_colours.isEmpty()) {
-            throw new NoColoursAvailableException("No more random colours are available, please select manually.");
-        }
-        Random rand = new Random();
-        int index = rand.nextInt(this.available_colours.size());
-        Color selected_colour = this.available_colours.get(index);
-        this.available_colours.remove(index);
-        return selected_colour;
-    }
-
     public void clean() {
         this.slices.clear();
         this.available_colours.clear();
@@ -115,6 +133,32 @@ public class McCPie extends JComponent {
         this.slices.add(slice);
         this.value_sum += slice.getValue();
         repaint();
+    }
+
+    public void addSlicesByArray(String[] names, double[] values) throws InvalidRangeException {
+        addSlicesByArray(names, values, null);
+    }
+
+    public void addSlicesByArray(String[] names, double[] values, Color[] colours) throws InvalidRangeException {
+        if (names.length != values.length) {
+            throw new InvalidRangeException("The names array and values array differ in length");
+        }
+
+        if (colours != null) {
+            throw new InvalidRangeException("The colours array length differs from the array and values array");
+        }
+
+        for (int i = 0; i < names.length; i++) {
+            Slice slice = new Slice();
+            slice.setName(names[i]);
+            slice.setValue(values[i]);
+            if (colours != null) {
+                slice.setColour(colours[i]);
+            } else {
+                slice.setColour(getRandomColour());
+            }
+            addSlice(slice);
+        }
     }
 
     /* Special thanks to: http://www.sumtotalz.com/TotalAppsWorks/PieChart/Pie_Chart.htm for pointing me in the
