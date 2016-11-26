@@ -4,6 +4,8 @@ import com.mccarthydaniel.McCPie.exceptions.NoColoursAvailableException;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
@@ -13,7 +15,7 @@ import javax.swing.JComponent;
  *
  * @author Daniel McCarthy
  */
-public class McCPie extends JComponent {
+public class McCPie extends JComponent{
 
     private static final int TEXT_BORDER_X = 420;
     private static final int TEXT_BORDER_Y = 100;
@@ -124,7 +126,7 @@ public class McCPie extends JComponent {
         int current_text_y = 0;
         int i = 0;
         for (Slice slice : this.slices) {
-            int angle = (int) ((slice.getValue() / this.value_sum) * 360);
+            int angle = (int) Math.round((slice.getValue() / this.value_sum) * 360);
             int s_x = McCPie.TEXT_BORDER_X + McCPie.TEXT_START_X;
             int s_y = McCPie.TEXT_BORDER_Y + McCPie.TEXT_START_Y + current_text_y;
             g.setColor(this.border_colour);
