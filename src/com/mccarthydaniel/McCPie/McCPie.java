@@ -12,6 +12,10 @@ import javax.swing.JComponent;
 
 /**
  *
+ * This is the actual graphical pie chart class, add this to a JFrame, or JPanel to see the McCPie chart.
+ * If you have an IDE such as netbeans, you may also add the McCPie class to your toolbox pallet, allowing for an easy
+ * click and drag of the component.
+ * 
  * @author Daniel McCarthy
  */
 public class McCPie extends JComponent {
@@ -40,6 +44,11 @@ public class McCPie extends JComponent {
         this.setup_available_colours();
     }
 
+    /* 
+    * Sets up all available standard solid colours in the system.
+    * These will be used later on to ensure that a unique colour may be returned
+    * if desired.
+    */
     private void setup_available_colours() {
         this.available_colours.add(Color.RED);
         this.available_colours.add(Color.GREEN);
@@ -52,14 +61,36 @@ public class McCPie extends JComponent {
         this.available_colours.add(Color.MAGENTA);
     }
 
+    /**
+     * Returns the current version of the McCPie chart.
+     * @return {@link String} containing version name
+    */
     public String getVersion() {
         return Config.version_name;
     }
 
+     /**
+     * Sets the current percentage format.
+     * The percentage format shows how much of a percentage to show should the system be configured
+     * to show percentages, you can show percentages with the {@link #showPercentages} method. These
+     * percentages are the calculated percentages of the slices for the pie chart.
+     * <p>
+     * The percentage format is handled with the {@link DecimalFormat} class, the default percentage format is set to "#.##"
+     * </p>
+     * @param percentage_format The string representation for the percentage format
+    */
     public void setPercentageFormat(String percentage_format) {
         this.df = new DecimalFormat(percentage_format);
     }
 
+    /**
+     * Returns a random colour.
+     * <p>
+     * Attempts to return a unique random solid colour based on the available solid colours setup in the system, if no unique available solid colours can be
+     * found it will return a random RGB colour that is not guaranteed to be unique.
+     * </p>
+     * @return {@link Color} object that represents a random colour.
+     */
     public Color getRandomColour() {
         if (this.available_colours.isEmpty())
         {
@@ -75,6 +106,10 @@ public class McCPie extends JComponent {
         return null;
     }
     
+    /**
+     * Returns a random RGB Colour 
+     * @return {@link Color} object that represents a random RGB colour.
+     */
     public Color getRandomRGBColour() {
         Random random = new Random();
         int R = random.nextInt(255);
@@ -83,6 +118,13 @@ public class McCPie extends JComponent {
         return new Color(R, G, B);
     }
 
+    /** 
+     * Returns a random solid colour that is available and not yet used or throws a {@link NoColoursAvailableException} when no more
+     * available solid colours exist.
+     * 
+     * @return {@link Color} object that represents a random solid colour.
+     * @throws NoColoursAvailableException will throw when no more unique solid colours are available
+     */
     public Color getRandomAvailableSolidColour() throws NoColoursAvailableException {
         if (this.available_colours.isEmpty()) {
             throw new NoColoursAvailableException("No more random colours are available, please select manually.");
@@ -94,26 +136,60 @@ public class McCPie extends JComponent {
         return selected_colour;
     }
 
+    /**
+     * Configures the system to show the percentages for the size of the pie slices on the pie chart or not.
+     * <p>
+     * <b>Percentage example</b> <i>if you had two slices of equal value then they would both have a percentage of 50% and both take up half of the pie chart.</i>
+     * <p>
+     * <i>By default percentages will not be shown.</i>
+     * </p>
+     * @param show_percentages set to true if the system should show percentages on the pie chart.
+     */
     public void showPercentages(boolean show_percentages) {
         this.show_percentages = show_percentages;
     }
 
+    /**
+     * Sets the title of the pie chart which will be displayed directly below it.
+     * @param title the title the pie chart should have
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     * Returns the title of the pie chart.
+     * @return the title of the pie chart
+     */
     public String getTitle() {
         return this.title;
     }
 
+    /**
+     * Sets the colour of the border that shows the pie chart slice names.
+     * <p>
+     * <i>By default the border colour is brown</i>
+     * </p>
+     * @param colour the Colour to set the border to.
+     */
     public void setBorderColour(Color colour) {
         this.border_colour = colour;
     }
 
+    /**
+     * Returns the colour of the border that shows the pie chart slice names.
+     * @return the colour of the border
+     */
     public Color getBorderColour() {
         return this.border_colour;
     }
 
+    /**
+     * Cleans the pie chart erasing all of its slices as if this was a new instance of {@link McCPie}
+     * <p>
+     * <i>This method should be called when all pie slices are now irrelevant and you wish to add new pie slices</i>
+     * </p>
+     */
     public void clean() {
         this.slices.clear();
         this.available_colours.clear();
@@ -122,16 +198,39 @@ public class McCPie extends JComponent {
         repaint();
     }
 
+    /**
+     * Adds a new slice to the pie chart
+     * @param slice The pie chart slice to add to the pie chart
+     */
     public void addSlice(Slice slice) {
         this.slices.add(slice);
         this.value_sum += slice.getValue();
         repaint();
     }
 
+    /**
+     * Create and adds slices by an array of <b>String[]</b> which represents slice names and an array of <b>double[]</b> which represents slice values
+     * <p>
+     * <i>The length of both the <b>String[]</b> array and the <b>double[]</b> array must match in length as each element in both of the arrays will
+     * create one slice</i>
+     * </p>
+     * @param names The array of pie slice names
+     * @param values The array of pie slice values
+     * @throws InvalidRangeException should the length of "names" and the length of "values" not match
+     */
     public void addSlicesByArray(String[] names, double[] values) throws InvalidRangeException {
         addSlicesByArray(names, values, null);
     }
 
+    /**
+     * Creates and adds slices by an array of <b>String[]</b> which represents slice names, an array of <b>double[]</b> which represents slice values 
+     * and finally an array of <b>Color[]</b> which represents the colours for the slices.
+     * 
+     * @param names The array of pie slice names
+     * @param values The array of pie slice values
+     * @param colours The array of pie slice colours.
+     * @throws InvalidRangeException should the length of "names", "values" and "colours" not match.
+     */
     public void addSlicesByArray(String[] names, double[] values, Color[] colours) throws InvalidRangeException {
         if (names.length != values.length) {
             throw new InvalidRangeException("The names array and values array differ in length");
@@ -156,6 +255,16 @@ public class McCPie extends JComponent {
 
     /* Special thanks to: http://www.sumtotalz.com/TotalAppsWorks/PieChart/Pie_Chart.htm for pointing me in the
     right direction of the drawing of the actual chart. All logic is my own hand with a little help from BBC Bitesize. */
+    /**
+     * Paints the pie chart
+     * <p>
+     * <i>
+     *  You will not ever need to call this method manually as it is handled by java's "repaint" method, which is called automatically
+     * by {@link McCPie}
+     * </i>
+     * </p>
+     * @param g the graphics object to paint to.
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
